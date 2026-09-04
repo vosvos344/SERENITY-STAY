@@ -1,0 +1,36 @@
+{
+  "checkedAt": "2026-09-04",
+  "photos": {
+    "mia201-hero.jpg": "https://a0.muscache.com/im/pictures/hosting/Hosting-1726477983734680758/original/5f319e28-0da7-4d71-ab05-1d42829327e8.jpeg?im_w=1920",
+    "mia201-bedroom.jpg": "https://a0.muscache.com/im/pictures/hosting/Hosting-1726477983734680758/original/238b4e53-f886-4b20-9b01-cd937c67e8ed.jpeg?im_w=1200",
+    "mia202-room.jpg": "https://a0.muscache.com/im/pictures/hosting/Hosting-1726520220054341394/original/d04b084c-f724-4913-91e7-155b641f7fec.jpeg?im_w=1200",
+    "mia201-1.jpg": "https://a0.muscache.com/im/pictures/hosting/Hosting-1726477983734680758/original/88755db3-95d4-490f-b1e2-03f85f2b9048.jpeg?im_w=1200",
+    "mia201-2.jpg": "https://a0.muscache.com/im/pictures/hosting/Hosting-1726477983734680758/original/5f319e28-0da7-4d71-ab05-1d42829327e8.jpeg?im_w=720",
+    "mia201-3.jpg": "https://a0.muscache.com/im/pictures/hosting/Hosting-1726477983734680758/original/83d43255-00ba-409d-b55f-b53571eb0f1f.jpeg?im_w=720",
+    "mia202-1.jpg": "https://a0.muscache.com/im/pictures/hosting/Hosting-1726520220054341394/original/e46a8888-3a04-4f1b-adc0-49eda4ee7c8c.jpeg?im_w=1200",
+    "mia202-2.jpg": "https://a0.muscache.com/im/pictures/hosting/Hosting-1726520220054341394/original/c482db73-3f1a-4848-adbf-399d49a965a9.jpeg?im_w=720",
+    "mia202-3.jpg": "https://a0.muscache.com/im/pictures/hosting/Hosting-1726520220054341394/original/a735a9e7-f34c-4608-9388-54cb50f09764.jpeg?im_w=720",
+    "yeonsin-1.jpg": "https://a0.muscache.com/im/pictures/hosting/Hosting-1308009905280384993/original/40c39237-c658-4cd5-a054-c06f21c5830f.jpeg?im_w=1200",
+    "yeonsin-2.jpg": "https://a0.muscache.com/im/pictures/airflow/Hosting-1308009905280384993/original/87d3b27e-44c8-4a27-8fb1-2f090d774c78.jpg?im_w=720",
+    "yeonsin-3.jpg": "https://a0.muscache.com/im/pictures/hosting/Hosting-1308009905280384993/original/3c9b2ea0-a4b4-4e4c-a296-cf63853657a9.jpeg?im_w=720",
+    "songdo-1.jpg": "https://a0.muscache.com/im/pictures/airflow/Hosting-1004921534125532868/original/82cc3d5b-8deb-4ae7-87b6-b8b55e9f1eab.jpg?im_w=1200",
+    "songdo-2.jpg": "https://a0.muscache.com/im/pictures/airflow/Hosting-1004921534125532868/original/26e05eb3-2f38-4263-b297-5eb9202fbbb1.jpg?im_w=720",
+    "songdo-3.jpg": "https://a0.muscache.com/im/pictures/airflow/Hosting-1004921534125532868/original/d3c903bd-f6f8-4d51-b2d5-83f0d4111233.jpg?im_w=720"
+  },
+  "tourism": [
+    {
+      "file": "assets/seoul-gyeongbokgung.jpg",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/3/35/Gyeongbokgung_Palace.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:Gyeongbokgung_Palace.jpg",
+      "author": "Janine Dupree", "year": "2005", "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0/"
+    },
+    {
+      "file": "assets/busan-gwangan.jpg",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/5/54/Gwangan_Bridge_from_Igidae_Park.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:Gwangan_Bridge_from_Igidae_Park.jpg",
+      "author": "The Big Cat", "year": "2007", "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0/"
+    }
+  ]
+}
