@@ -359,11 +359,13 @@ else (() => {
     const clientId=typeof SERENITY_MAP_CONFIG==='undefined'?'':SERENITY_MAP_CONFIG.clientId.trim();
     if(!clientId || naverFailed)return Promise.resolve(null);
     if(!naverReady)naverReady=new Promise(resolve=>{
-      window.serenityMapsReady=()=>resolve(window.naver?.maps || null);
       window.navermap_authFailure=()=>{naverFailed=true;cleanupMap();resolve(null);};
       const script=document.createElement('script');
-      script.src='https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId='+encodeURIComponent(clientId)+'&language=en&callback=serenityMapsReady';
+      script.src='https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId='+encodeURIComponent(clientId)+'&language=en';
       script.async=true;
+      // The SDK callback can precede its window.naver.maps export. The native
+      // load event runs after the complete core script has been evaluated.
+      script.onload=()=>resolve(window.naver?.maps || null);
       script.onerror=window.navermap_authFailure;
       document.head.append(script);
     });

@@ -193,12 +193,12 @@ em { font-weight: inherit; }
 .map-selected-home span { font-size: .75rem; color: var(--muted); letter-spacing: .07em; }
 .map-selected-home strong { font-size: 1.0625rem; font-weight: 500; }
 .map-panel { min-width: 0; }
-.map-stage { display: grid; min-width: 0; }
+.map-stage { display: grid; grid-template-columns: minmax(0,1fr); min-width: 0; }
 .map-stage > .neighbourhood-map { grid-area: 1 / 1; }
 .map-label { padding: 13px 19px; background: var(--dark); color: #fcf8ed; border-radius: 3px 3px 0 0; }
 .map-label > span { display: block; color: #d7c29e; font-size: .75rem; letter-spacing: .05em; margin-bottom: 2px; }
 .map-label > strong { font-weight: 400; font-size: 1rem; }
-.neighbourhood-map { display: block; width: 100%; aspect-ratio: 1.7; min-height: 310px; border: 0; background: #e3e7d9; }
+.neighbourhood-map { display: block; width: 100%; min-width: 0; max-width: 100%; aspect-ratio: 1.7; min-height: 310px; border: 0; background: #e3e7d9; }
 .map-placeholder { display: grid; place-content: center; justify-items: center; gap: 16px; padding: 32px; text-align: center; color: var(--muted); }
 .map-placeholder > .icon { width: 32px; height: 32px; color: var(--gold); }
 .map-placeholder > p { max-width: 34ch; font-size: .9375rem; }

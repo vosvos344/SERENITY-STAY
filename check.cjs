@@ -159,6 +159,9 @@ assert.ok(!/position:\s*(absolute|fixed)/.test(css.replace(/\.sr-only \{[^}]+\}/
 assert.ok(!app.includes('history.pushState'),'Detail pages use real browser navigation');
 assert.ok(!/openstreetmap|mapUrls|mapOpen|data-map-external/i.test(app+source('content.js')+css),'Removed provider is not requested or rendered anywhere');
 assert.ok(!app.includes('new maps.Marker'),'Sample maps must not imply an exact accommodation pin');
+assert.ok(/\.map-stage \{[^}]*grid-template-columns: minmax\(0,1fr\);/.test(css),'Map track must shrink below aspect-ratio transferred minimum width');
+assert.ok(/\.neighbourhood-map \{[^}]*min-width: 0;[^}]*max-width: 100%;/.test(css),'Both the notice and live map must fit their column');
+assert.ok(!app.includes('serenityMapsReady'),'Do not resolve the SDK before its public namespace is exported');
 assert.ok(app.includes('function setupScrollTracks()') && !app.includes('function setupGallery()'), 'Share the native scrolling controller');
 assert.ok(app.includes('if(event.target===track'), 'Arrow keys on child links must not be intercepted');
 
@@ -279,16 +282,18 @@ async function checkMaps(){
   const empty=mapFixture('');await empty.context.sync();
   assert.equal(empty.scripts.length,0);assert.ok(!empty.context.host.placeholder.hidden);
   const f=mapFixture('test-public-id');
+  const namespace=f.context.window.naver;delete f.context.window.naver;
   const first=f.context.sync(),second=f.context.sync();
   assert.equal(f.scripts.length,1,'SDK requested only once while pending');
   const sdk=new URL(f.scripts[0].src);
   assert.equal(sdk.origin,'https://oapi.map.naver.com');
   assert.equal(sdk.searchParams.get('ncpKeyId'),'test-public-id');
   assert.equal(sdk.searchParams.get('language'),'en');
-  assert.equal(sdk.searchParams.get('callback'),'serenityMapsReady');
+  assert.ok(!sdk.searchParams.has('callback'),'Use native script load after the entire SDK evaluates');
+  assert.equal(f.instances.length,0,'No namespace exists while the SDK is executing');
   assert.ok(!/secret/i.test(sdk.search),'No Secret in browser requests');
   f.context.host.panel.dataset.mapStay='songdo';
-  f.context.window.serenityMapsReady();await Promise.all([first,second]);
+  f.context.window.naver=namespace;f.scripts[0].onload();await Promise.all([first,second]);
   assert.equal(f.instances.length,1,'Pending calls reuse one map and newest location');
   assert.equal(f.instances[0].options.center.lat,35.077);
   assert.equal(f.instances[0].options.scrollWheel,false);
@@ -303,10 +308,10 @@ async function checkMaps(){
   fail.scripts[0].onerror();await pending;assert.equal(fail.instances.length,0);assert.ok(!fail.context.host.placeholder.hidden);
   const stale=mapFixture('test-public-id'),old=stale.context.sync();
   stale.context.host=stale.makeHost('songdo');const latest=stale.context.sync();
-  stale.context.window.serenityMapsReady();await Promise.all([old,latest]);
+  stale.scripts[0].onload();await Promise.all([old,latest]);
   assert.equal(stale.instances.length,1);assert.equal(stale.instances[0].host,stale.context.host,'No map in a replaced language DOM');
   const broken=mapFixture('test-public-id');broken.context.window.naver.maps.Map=class{constructor(){throw Error('SDK failure');}};
-  const brokenLoad=broken.context.sync();broken.context.window.serenityMapsReady();await brokenLoad;
+  const brokenLoad=broken.context.sync();broken.scripts[0].onload();await brokenLoad;
   assert.ok(broken.context.host.hidden && !broken.context.host.placeholder.hidden,'Constructor failure shows the local notice only');
   console.log('PASS — shared rail entry/loading/replay/cleanup; SDK blank/success/reuse/failure/stale-DOM checks (mocked, no network).');
 }
@@ -317,7 +322,7 @@ assert.ok(homeSource.includes(createView().home()),'Homepage must match generate
 inspectHTML(homeSource);
 for(const stay of openStays){
   const detailSource=source(`stays/${stay.id}.html`);
-  assert.ok(detailSource.includes('../styles.css?v=12') && detailSource.includes('../app.js?v=12') && detailSource.includes('../map-config.js?v=12'), 'Shared updated assets on every detail page');
+  assert.ok(detailSource.includes('../styles.css?v=13') && detailSource.includes('../app.js?v=13') && detailSource.includes('../map-config.js?v=13'), 'Shared updated assets on every detail page');
   assert.ok(detailSource.includes(createView('en','../').detail(stay)),'Detail output must match source');
   assert.ok(detailSource.includes(`<title>${stay.name[0]} — Serenity Stay</title>`));
   inspectHTML(detailSource,'stays');
