@@ -596,15 +596,20 @@ const SERENITY_CONTENT = {
       "{name} — 주변 지역 샘플 지도",
       "{name} — 周边区域示例地图"
     ],
-    "mapOpen": [
-      "Open a larger map",
-      "큰 지도에서 보기",
-      "查看大地图"
+    "mapNaver": [
+      "Open NAVER Map",
+      "네이버 지도에서 보기",
+      "在 NAVER 地图中查看"
     ],
     "mapUnavailable": [
-      "Map not showing? Use the larger-map link. Availability depends on your network.",
-      "지도가 표시되지 않으면 큰 지도 링크를 이용해 주세요. 네트워크 환경에 따라 표시가 제한될 수 있습니다.",
-      "地图未显示？可通过大地图链接查看。显示情况取决于网络环境。"
+      "If the map doesn't appear, explore the area using the Open NAVER Map link below.",
+      "지도가 표시되지 않으면 아래 ‘네이버 지도에서 보기’를 이용해 주변 지역을 확인해 주세요.",
+      "若地图未显示，请点击下方“在 NAVER 地图中查看”，了解周边区域。"
+    ],
+    "mapLanguage": [
+      "NAVER map labels are displayed in English.",
+      "네이버 지도 지명은 영어로 표시됩니다.",
+      "NAVER 地图地名以英语显示。"
     ],
     "mapFor": [
       "AREA PREVIEW FOR",
@@ -705,7 +710,7 @@ const SERENITY_CONTENT = {
         "kind": "area-sample",
         "lat": 37.628,
         "lng": 127.026,
-        "span": 0.012,
+        "search": "서울 미아역",
         "label": [
           "Mia & Suyu, Seoul",
           "서울 미아·수유 일대",
@@ -794,7 +799,7 @@ const SERENITY_CONTENT = {
         "kind": "area-sample",
         "lat": 37.628,
         "lng": 127.026,
-        "span": 0.012,
+        "search": "서울 미아역",
         "label": [
           "Mia & Suyu, Seoul",
           "서울 미아·수유 일대",
@@ -892,7 +897,7 @@ const SERENITY_CONTENT = {
         "kind": "area-sample",
         "lat": 37.619,
         "lng": 126.921,
-        "span": 0.012,
+        "search": "서울 연신내역",
         "label": [
           "Yeonsinnae, Seoul",
           "서울 연신내 일대",
@@ -980,7 +985,7 @@ const SERENITY_CONTENT = {
         "kind": "area-sample",
         "lat": 35.077,
         "lng": 129.02,
-        "span": 0.012,
+        "search": "부산 송도해수욕장",
         "label": [
           "Songdo Beach area, Busan",
           "부산 송도해수욕장 일대",

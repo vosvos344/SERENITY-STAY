@@ -30,13 +30,8 @@ const Serenity = (() => {
   };
   const icon = name => `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name] || icons.home}</svg>`;
 
-  function mapUrls(stay) {
-    const {lat,lng,span} = stay.map;
-    const bounds = [lng-span,lat-span*.65,lng+span,lat+span*.65].map(value=>value.toFixed(5));
-    return {
-      embed: 'https://www.openstreetmap.org/export/embed.html?bbox='+encodeURIComponent(bounds.join(','))+'&layer=mapnik',
-      external: 'https://www.openstreetmap.org/#map=14/'+lat+'/'+lng
-    };
+  function naverMapUrl(stay) {
+    return 'https://map.naver.com/p/search/'+encodeURIComponent(stay.map.search);
   }
 
   function createView(language = 'en', root = '') {
@@ -53,6 +48,8 @@ const Serenity = (() => {
       const size=data.imageSizes[src];
       return `<img class="${cls}" src="${asset(src)}" alt="${escape(alt)}" ${size?`width="${size[0]}" height="${size[1]}"`:''} ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
     };
+    // Keep semantic heading lines in HTML; CSS animates each line without hiding photos.
+    const heading = (text, id = '') => `<h2 class="motion-title"${id ? ` id="${escape(id)}"` : ''}>${text.split('\n').map((line,i)=>`<span class="motion-line" style="--line-index:${i}"><span>${escape(line)}</span></span>`).join('')}</h2>`;
     const bookLink = (stay, cls = 'button button-gold') => `<a class="${cls}" href="${booking(stay)}" ${external}>${tx('bookAirbnb')}${icon('diagonal')}<span class="sr-only">${tx('external')}</span></a>`;
 
     function header() {
@@ -88,23 +85,22 @@ const Serenity = (() => {
 
     function showcase(stay) {
       return `<article class="home-showcase" aria-labelledby="showcase-name">
-        <div class="showcase-photos reveal media-reveal"><a class="showcase-cover" href="${url(stay)}">${image(stay.cover,local(stay.alt))}<span class="showcase-photo-label"><span>SERENITY STAY / ${escape(stay.city.toUpperCase())}</span>${icon('diagonal')}</span></a></div>
+        <div class="showcase-photos reveal"><a class="showcase-cover" href="${url(stay)}">${image(stay.cover,local(stay.alt))}<span class="showcase-photo-label"><span>SERENITY STAY / ${escape(stay.city.toUpperCase())}</span>${icon('diagonal')}</span></a></div>
         <div class="showcase-copy reveal"><div class="showcase-chapter"><span aria-hidden="true">${String(openStays.findIndex(item=>item.id===stay.id)+1).padStart(2,'0')}</span><p class="eyebrow">${escape(city(stay.city))}<br>${escape(local(stay.area))}</p></div><h3 id="showcase-name">${escape(local(stay.name))}</h3><p class="showcase-signature">${escape(local(stay.signature.title))}</p><p class="showcase-story">${escape(local(stay.signature.text))}</p><ul class="showcase-facts"><li>${icon('people')}${escape(t('guestCount',{n:stay.maxGuests}))}</li><li>${icon('bed')}${escape(t('bedroomCount',{n:stay.bedrooms}))}</li><li>${icon('bath')}${escape(t('bathroomCount',{n:stay.bathrooms}))}</li></ul><ul class="showcase-amenities">${stay.amenities.slice(0,3).map(key=>`<li>${tx(key)}</li>`).join('')}</ul><a class="button button-dark" href="${url(stay)}">${tx('viewTour')}${icon('arrow')}</a><a class="showcase-location" href="${url(stay)}#location">${icon('pin')}${tx('viewLocation')}</a></div>
       </article>`;
     }
 
     function mapPanel(stay) {
-      const urls=mapUrls(stay);
-      return `<div class="map-panel"><div class="map-label"><span>${tx('mapSample')}</span><strong>${escape(local(stay.map.label))}</strong></div><iframe class="neighbourhood-map" src="${escape(urls.embed)}" title="${escape(t('mapTitleLabel',{name:local(stay.name)}))}" loading="lazy" referrerpolicy="no-referrer"></iframe><div class="map-caption"><p>${tx('mapNotice')}</p><a href="${escape(urls.external)}" ${external}>${tx('mapOpen')}${icon('diagonal')}<span class="sr-only">${tx('external')}</span></a></div><p class="map-network-note">${tx('mapUnavailable')}</p></div>`;
+      return `<div class="map-panel" data-map-stay="${stay.id}"><div class="map-label"><span>${tx('mapSample')}</span><strong>${escape(local(stay.map.label))}</strong></div><div class="map-stage"><div class="neighbourhood-map map-placeholder" role="status">${icon('pin')}<p>${tx('mapUnavailable')}</p></div><div class="neighbourhood-map naver-map" role="region" aria-label="${escape(t('mapTitleLabel',{name:local(stay.name)}))}" hidden></div></div><div class="map-caption"><p>${tx('mapNotice')}</p><a data-map-naver href="${escape(naverMapUrl(stay))}" ${external}>${tx('mapNaver')}${icon('diagonal')}<span class="sr-only">${tx('external')}</span></a></div><p class="map-network-note">${tx('mapLanguage')}</p></div>`;
     }
 
     function collectionMap(stay) {
-      return `<div class="collection-map" id="collection-map"><div class="collection-map-copy"><p class="eyebrow">${tx('mapKicker')}</p><h3>${tx('mapTitle')}</h3><p>${tx('mapDescription')}</p><label class="map-select-label" for="map-stay">${tx('mapSelect')}</label><select id="map-stay">${openStays.map(item=>`<option value="${item.id}" ${item.id===stay.id?'selected':''}>${escape(local(item.name))} · ${escape(city(item.city))}</option>`).join('')}</select><p class="map-selected-home"><span>${tx('mapFor')}</span><strong id="map-home-name">${escape(local(stay.name))}</strong></p></div><div id="collection-map-panel">${mapPanel(stay)}</div></div>`;
+      return `<div class="collection-map" id="collection-map"><div class="collection-map-copy"><p class="eyebrow">${tx('mapKicker')}</p><h3>${tx('mapTitle')}</h3><p>${tx('mapDescription')}</p><label class="map-select-label" for="map-stay">${tx('mapSelect')}</label><select id="map-stay">${openStays.map(item=>`<option value="${item.id}" ${item.id===stay.id?'selected':''}>${escape(local(item.name))} · ${escape(city(item.city))}</option>`).join('')}</select><p class="map-selected-home"><span>${tx('mapFor')}</span><strong id="map-home-name">${escape(local(stay.name))}</strong></p></div><div id="collection-map-panel" class="map-scene">${mapPanel(stay)}</div></div>`;
     }
 
     function benefit(name, pictogram) {
       const number = ['Together','Home','Kitchen','Laundry','Arrival'].indexOf(name)+1;
-      return `<li class="benefit reveal"><div class="benefit-top"><span aria-hidden="true">0${number}</span>${icon(pictogram)}</div><h3>${tx(`value${name}`)}</h3><p>${tx(`value${name}Text`)}</p></li>`;
+      return `<li class="benefit reveal" style="--sequence:${number-1}"><div class="benefit-top"><span aria-hidden="true">0${number}</span>${icon(pictogram)}</div><h3>${tx(`value${name}`)}</h3><p>${tx(`value${name}Text`)}</p></li>`;
     }
 
     function destination(place) {
@@ -114,11 +110,11 @@ const Serenity = (() => {
 
     function home(featured = openStays[0]) {
       return `${homeHero()}
-        <section class="section collection shell" id="stays" aria-labelledby="collection-title"><div class="collection-intro"><div class="reveal"><p class="eyebrow">${tx('collectionKicker')}</p><h2 id="collection-title">${tx('collectionTitle')}</h2></div><div class="host-introduction reveal"><p>${tx('collectionDescription')}</p><p class="host-signature">${image('assets/logo-wood.png','','host-mark')}<span>${tx('hostSignature')}</span></p></div></div>
+        <section class="section collection shell" id="stays" aria-labelledby="collection-title"><div class="collection-intro"><div class="reveal"><p class="eyebrow">${tx('collectionKicker')}</p>${heading(t('collectionTitle'),'collection-title')}</div><div class="host-introduction reveal"><p>${tx('collectionDescription')}</p><p class="host-signature">${image('assets/logo-wood.png','','host-mark')}<span>${tx('hostSignature')}</span></p></div></div>
         <div class="showcase-toolbar"><p class="eyebrow">${tx('featuredKicker')}</p><div class="showcase-navigation js-control"><span id="showcase-count">${String(openStays.findIndex(item=>item.id===featured.id)+1).padStart(2,'0')} / ${String(openStays.length).padStart(2,'0')}</span><button class="round-button" data-showcase-step="-1" aria-controls="featured-home" aria-label="${tx('showcasePrev')}" type="button">${icon('left')}</button><button class="round-button" data-showcase-step="1" aria-controls="featured-home" aria-label="${tx('showcaseNext')}" type="button">${icon('right')}</button></div></div><div id="featured-home">${showcase(featured)}</div><p id="showcase-status" class="sr-only" role="status"></p>
         <div class="collection-meta"><div><h3>${tx('browseHomes')}</h3><span>${escape(t('collectionCount',{open:openStays.length,soon:data.stays.length-openStays.length}))}</span></div><div class="rail-controls js-control"><button class="round-button" data-scroll-for="home-rail" data-scroll-step="-1" aria-label="${tx('railPrev')}" type="button">${icon('left')}</button><button class="round-button" data-scroll-for="home-rail" data-scroll-step="1" aria-label="${tx('railNext')}" type="button">${icon('right')}</button></div></div><div class="home-rail" id="home-rail" data-scroll-track tabindex="0" aria-label="${tx('browseHomes')}">${data.stays.map(card).join('')}</div>${collectionMap(featured)}</section>
-        <section class="why-section" id="why" aria-labelledby="why-title"><div class="shell"><div class="section-heading centered reveal"><p class="eyebrow">${tx('whyKicker')}</p><h2 id="why-title">${tx('whyTitle')}</h2><p>${tx('whyDescription')}</p></div><ul class="benefits">${benefit('Together','people')}${benefit('Home','home')}${benefit('Kitchen','kitchen')}${benefit('Laundry','laundry')}${benefit('Arrival','key')}</ul><div class="quiet-note reveal"><span></span><p>${tx('heroFootnote')}</p><span></span></div></div></section>
-        <section class="section places-section shell" id="places" aria-labelledby="places-title"><div class="section-heading split reveal"><div><p class="eyebrow">${tx('placesKicker')}</p><h2 id="places-title">${tx('placesTitle')}</h2></div><p>${tx('placesDescription')}</p></div><div class="destinations-grid">${data.destinations.map(destination).join('')}</div></section>`;
+        <section class="why-section" id="why" aria-labelledby="why-title"><div class="shell"><div class="section-heading centered reveal"><p class="eyebrow">${tx('whyKicker')}</p>${heading(t('whyTitle'),'why-title')}<p>${tx('whyDescription')}</p></div><ul class="benefits">${benefit('Together','people')}${benefit('Home','home')}${benefit('Kitchen','kitchen')}${benefit('Laundry','laundry')}${benefit('Arrival','key')}</ul><div class="quiet-note reveal"><span></span><p>${tx('heroFootnote')}</p><span></span></div></div></section>
+        <section class="section places-section shell" id="places" aria-labelledby="places-title"><div class="section-heading split reveal"><div><p class="eyebrow">${tx('placesKicker')}</p>${heading(t('placesTitle'),'places-title')}</div><p>${tx('placesDescription')}</p></div><div class="destinations-grid">${data.destinations.map(destination).join('')}</div></section>`;
     }
 
     function detail(stay) {
@@ -128,11 +124,11 @@ const Serenity = (() => {
       const amenityIcon = {tub:'bath',kitchen:'kitchen',laundry:'laundry',elevator:'elevator',parking:'parking',selfCheckIn:'key',ocean:'ocean'};
       return `<section class="hero detail-hero" id="top"><div class="hero-visual">${image(stay.cover, local(stay.alt), 'detail-cover', true)}</div><div class="hero-shade"></div><div class="hero-content">${header()}<div class="hero-copy shell"><a class="back-link" href="${root}index.html#stays">${icon('left')}${tx('backStays')}</a><p class="eyebrow">${escape(city(stay.city))} / ${escape(local(stay.area))}</p><h1><span class="line-mask"><span>${escape(local(stay.name))}</span></span></h1><p class="detail-tagline">${escape(local(stay.tagline))}</p><div class="hero-buttons">${bookLink(stay,'button button-cream')}<a class="button button-outline" href="#gallery">${tx('gallery')}${icon('down')}</a></div></div><div class="detail-hero-foot shell"><span>${tx('privateHome')}</span><span>SERENITY STAY · ${escape(stay.city.toUpperCase())}</span></div></div></section>
         <div class="stay-overview shell"><dl class="stats">${facts.map(([label,value])=>`<div><dt>${tx(label)}</dt><dd>${value}</dd></div>`).join('')}</dl><nav class="detail-nav" aria-label="${tx('about')}">${[['about','about'],['gallery','gallery'],['amenities','amenities'],['location','location']].map(([id,key])=>`<a href="#${id}">${tx(key)}</a>`).join('')}</nav></div>
-        <section class="detail-story section shell" id="about"><div class="story-copy reveal"><p class="eyebrow">${tx('detailKicker')}</p><h2>${escape(local(stay.storyTitle))}</h2><p class="story-description">${escape(local(stay.description))}</p><p class="detail-host-note">${tx('detailHostNote')}</p><div class="sleeping-copy"><span class="small-icon">${icon('bed')}</span><div><h3>${tx('sleepingTitle')}</h3><p>${escape(local(stay.sleeping))}</p></div></div></div><figure class="story-photo reveal">${image(stay.storyImage,t('photoOf',{name:local(stay.name),n:stay.photos.indexOf(stay.storyImage)+1}))}<figcaption><span>${escape(local(stay.name))}</span><span>Serenity Stay</span></figcaption></figure></section>
-        <section class="gallery-section" id="gallery" aria-labelledby="gallery-title"><div class="shell gallery-heading"><div class="section-heading reveal"><p class="eyebrow">${tx('gallery')}</p><h2 id="gallery-title">${tx('galleryTitle')}</h2><p>${tx('galleryHint')}</p></div><div class="gallery-controls"><button class="round-button" data-scroll-for="gallery-track" data-scroll-step="-1" aria-label="${tx('previous')}" type="button">${icon('left')}</button><button class="round-button" data-scroll-for="gallery-track" data-scroll-step="1" aria-label="${tx('next')}" type="button">${icon('right')}</button></div></div><div class="gallery-track" id="gallery-track" data-scroll-track tabindex="0" aria-label="${tx('gallery')}">${stay.photos.map((src,i)=>`<figure>${image(src,t('photoOf',{name:local(stay.name),n:i+1}))}<figcaption><span>${String(i+1).padStart(2,'0')} / ${String(stay.photos.length).padStart(2,'0')}</span><span>${escape(local(stay.name))}</span></figcaption></figure>`).join('')}</div></section>
-        <section class="section amenities-section shell" id="amenities"><div class="section-heading reveal"><p class="eyebrow">${tx('amenities')}</p><h2>${tx('amenityTitle')}</h2><p>${tx('sleepingNote')}</p></div><ul class="amenity-grid">${stay.amenities.map(key=>`<li class="reveal">${icon(amenityIcon[key])}<span>${tx(key)}</span></li>`).join('')}</ul></section>
-        <section class="location-section" id="location"><div class="shell location-grid"><div class="location-map">${mapPanel(stay)}</div><div class="location-copy reveal"><p class="eyebrow">${escape(city(stay.city))} / ${escape(local(stay.area))}</p><h2>${tx('localTitle')}</h2><p>${escape(local(stay.neighbourhood))}</p><p class="address-note">${icon('pin')}${tx('exactAddress')}</p><a class="text-link" href="${escape(place.guideUrl)}" ${external}>${tx('cityGuide')}${icon('diagonal')}<span class="sr-only">${tx('external')}</span></a><details class="arrival-details"><summary>${tx('arrival')}<span aria-hidden="true">+</span></summary><p>${tx(stay.arrivalKey)}</p></details></div></div></section>
-        <section class="reserve-section shell reveal" id="reserve"><p class="eyebrow">${tx('reserveKicker')}</p><h2>${tx('reserveTitle')}</h2><p class="reserve-name">${escape(local(stay.name))} · ${escape(city(stay.city))}</p>${bookLink(stay)}<p class="reserve-note">${tx('reserveNote')}</p><a class="text-link" href="${root}index.html#stays">${tx('allStays')}${icon('arrow')}</a></section>`;
+        <section class="detail-story section shell" id="about"><div class="story-copy reveal"><p class="eyebrow">${tx('detailKicker')}</p>${heading(local(stay.storyTitle))}<p class="story-description">${escape(local(stay.description))}</p><p class="detail-host-note">${tx('detailHostNote')}</p><div class="sleeping-copy"><span class="small-icon">${icon('bed')}</span><div><h3>${tx('sleepingTitle')}</h3><p>${escape(local(stay.sleeping))}</p></div></div></div><figure class="story-photo reveal"><div class="story-photo-frame">${image(stay.storyImage,t('photoOf',{name:local(stay.name),n:stay.photos.indexOf(stay.storyImage)+1}))}</div><figcaption><span>${escape(local(stay.name))}</span><span>Serenity Stay</span></figcaption></figure></section>
+        <section class="gallery-section" id="gallery" aria-labelledby="gallery-title"><div class="shell gallery-heading"><div class="section-heading reveal"><p class="eyebrow">${tx('gallery')}</p>${heading(t('galleryTitle'),'gallery-title')}<p>${tx('galleryHint')}</p></div><div class="gallery-controls"><button class="round-button" data-scroll-for="gallery-track" data-scroll-step="-1" aria-label="${tx('previous')}" type="button">${icon('left')}</button><button class="round-button" data-scroll-for="gallery-track" data-scroll-step="1" aria-label="${tx('next')}" type="button">${icon('right')}</button></div></div><div class="gallery-track" id="gallery-track" data-scroll-track tabindex="0" aria-label="${tx('gallery')}">${stay.photos.map((src,i)=>`<figure><div class="gallery-photo">${image(src,t('photoOf',{name:local(stay.name),n:i+1}))}</div><figcaption><span>${String(i+1).padStart(2,'0')} / ${String(stay.photos.length).padStart(2,'0')}</span><span>${escape(local(stay.name))}</span></figcaption></figure>`).join('')}</div></section>
+        <section class="section amenities-section shell" id="amenities"><div class="section-heading reveal"><p class="eyebrow">${tx('amenities')}</p>${heading(t('amenityTitle'))}<p>${tx('sleepingNote')}</p></div><ul class="amenity-grid">${stay.amenities.map(key=>`<li class="reveal">${icon(amenityIcon[key])}<span>${tx(key)}</span></li>`).join('')}</ul></section>
+        <section class="location-section" id="location"><div class="shell location-grid"><div class="location-map map-scene">${mapPanel(stay)}</div><div class="location-copy reveal"><p class="eyebrow">${escape(city(stay.city))} / ${escape(local(stay.area))}</p>${heading(t('localTitle'))}<p>${escape(local(stay.neighbourhood))}</p><p class="address-note">${icon('pin')}${tx('exactAddress')}</p><a class="text-link" href="${escape(place.guideUrl)}" ${external}>${tx('cityGuide')}${icon('diagonal')}<span class="sr-only">${tx('external')}</span></a><details class="arrival-details"><summary>${tx('arrival')}<span aria-hidden="true">+</span></summary><p>${tx(stay.arrivalKey)}</p></details></div></div></section>
+        <section class="reserve-section shell reveal" id="reserve"><p class="eyebrow">${tx('reserveKicker')}</p>${heading(t('reserveTitle'))}<p class="reserve-name">${escape(local(stay.name))} · ${escape(city(stay.city))}</p>${bookLink(stay)}<p class="reserve-note">${tx('reserveNote')}</p><a class="text-link" href="${root}index.html#stays">${tx('allStays')}${icon('arrow')}</a></section>`;
     }
 
     function footer() {
@@ -140,7 +136,7 @@ const Serenity = (() => {
     }
     return {t,local,city,header,card,showcase,mapPanel,home,detail,footer,url,booking,htmlLang:htmlLanguages[index]};
   }
-  return {data,languages,openStays,createView,mapUrls,escape,icon};
+  return {data,languages,openStays,createView,naverMapUrl,escape,icon};
 })();
 
 if (typeof module !== 'undefined') module.exports = Serenity;
@@ -154,9 +150,10 @@ else (() => {
   let mappedStay = openStays[0];
   let language = 'en';
   let view = createView(language,root);
-  let cleanupMotion = () => {};
   let cleanupSlideshow = () => {};
   let cleanupTracks = () => {};
+  let cleanupEntrances = () => {};
+  let refreshEntrances = () => {};
   let heroIndex = 0;
   let heroPaused = false;
   let showcaseRequest = 0;
@@ -166,27 +163,6 @@ else (() => {
     showcaseRequest++;
     showcaseAnimations.forEach(animation=>animation.cancel());
     showcaseAnimations=[];
-  }
-
-  function animateSections() {
-    if (!('IntersectionObserver' in window) || reduceMotion.matches) return;
-    const elements = [...document.querySelectorAll('.reveal, .home-rail .stay-card, .collection-map-copy, .story-photo, .gallery-track figure')];
-    // Content is visible by default. Observation only starts a finite movement;
-    // clipping the observed element itself can make its intersection stay zero.
-    elements.forEach(element=>{
-      const siblings=[...element.parentElement.children].filter(child=>elements.includes(child));
-      element.style.setProperty('--order',Math.min(siblings.indexOf(element),4));
-      element.classList.toggle('media-reveal',element.matches('.showcase-photos, .story-photo, .gallery-track figure'));
-    });
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add('is-entering');
-        observer.unobserve(entry.target);
-      });
-    },{threshold:0.05});
-    elements.forEach(element=>observer.observe(element));
-    cleanupMotion=()=>{observer.disconnect();elements.forEach(el=>el.classList.remove('is-entering'));};
   }
 
   function startSlideshow() {
@@ -272,9 +248,22 @@ else (() => {
     const cleanups=[];
     document.querySelectorAll('[data-scroll-track]').forEach(track=>{
       const buttons=[...document.querySelectorAll(`[data-scroll-for="${track.id}"]`)];
-      const update=()=>{buttons[0].disabled=track.scrollLeft<4;buttons[1].disabled=track.scrollLeft+track.clientWidth>=track.scrollWidth-4;};
+      const frames=[...track.children];
+      const images=[...track.querySelectorAll('img')];
+      const update=()=>{
+        buttons[0].disabled=track.scrollLeft<4;
+        buttons[1].disabled=track.scrollLeft+track.clientWidth>=track.scrollWidth-4;
+        const bounds=track.getBoundingClientRect();
+        frames.forEach(frame=>{
+          const left=frame.getBoundingClientRect().left;
+          const visible=Math.min(left+frame.offsetWidth,bounds.right)-Math.max(left,bounds.left);
+          const image=frame.querySelector('img');
+          // Offscreen photos re-arm; loading photos must not finish before loading.
+          if(visible<=0 || (image && !image.naturalWidth))frame.classList.remove('frame-active');
+          else if(visible>=Math.min(frame.offsetWidth,track.clientWidth)*.2)frame.classList.add('frame-active');
+        });
+      };
       function step(direction) {
-        const frames=[...track.children];
         const trackLeft=track.getBoundingClientRect().left;
         const inset=parseFloat(getComputedStyle(track).paddingLeft);
         const distances=frames.map(frame=>Math.abs(frame.getBoundingClientRect().left-trackLeft-inset));
@@ -288,21 +277,116 @@ else (() => {
       track.addEventListener('keydown',onKey);
       track.addEventListener('scroll',update,{passive:true});
       window.addEventListener('resize',update);
-      track.querySelectorAll('img').forEach(img=>img.addEventListener('load',update,{once:true}));
+      images.forEach(img=>img.addEventListener('load',update,{once:true}));
       update();
-      cleanups.push(()=>{track.removeEventListener('keydown',onKey);track.removeEventListener('scroll',update);window.removeEventListener('resize',update);});
+      cleanups.push(()=>{
+        track.removeEventListener('keydown',onKey);track.removeEventListener('scroll',update);window.removeEventListener('resize',update);
+        images.forEach(img=>img.removeEventListener('load',update));
+        frames.forEach(frame=>frame.classList.remove('frame-active'));
+      });
     });
     cleanupTracks=()=>cleanups.forEach(cleanup=>cleanup());
+  }
+
+  // Observe stationary layout boxes; only their children move. CSS transitions
+  // own the clock and reverse continuously when the same 85% line is crossed.
+  function setupEntrances() {
+    cleanupEntrances();
+    if (reduceMotion.matches || !('IntersectionObserver' in window)) return;
+    const targets = new Set();
+    let observer;
+    const setState = (target, top, boundary = window.innerHeight * .85) => target.classList.toggle('motion-active', top <= boundary);
+    const reconnect = () => {
+      observer?.disconnect();
+      observer = new IntersectionObserver(entries => {
+        // Leaving through the TOP keeps the final state, not a reverse/hide.
+        entries.forEach(entry => setState(entry.target, entry.boundingClientRect.top, entry.rootBounds?.bottom));
+      }, {rootMargin:`0px 0px -${window.innerHeight * .15}px 0px`, threshold:0});
+      targets.forEach(target => observer.observe(target));
+    };
+    refreshEntrances = () => {
+      targets.forEach(target => {
+        if (!target.isConnected) {observer.unobserve(target); targets.delete(target);}
+      });
+      document.querySelectorAll('.motion-title, .reveal:not(.benefit), .home-rail, .gallery-track, .benefits, .collection-map-copy, .map-scene').forEach(target => {
+        if (targets.has(target)) return;
+        setState(target, target.getBoundingClientRect().top);
+        target.classList.add('motion-ready');
+        if (target.matches('.home-rail, .gallery-track')) {
+          [...target.children].forEach((child,i) => child.style.setProperty('--sequence', Math.min(i,2)));
+        }
+        targets.add(target);
+        observer.observe(target);
+      });
+    };
+    reconnect();
+    refreshEntrances();
+    window.addEventListener('resize', reconnect);
+    cleanupEntrances = () => {
+      observer.disconnect();
+      window.removeEventListener('resize', reconnect);
+      targets.forEach(target => target.classList.remove('motion-ready','motion-active'));
+      refreshEntrances = () => {};
+    };
   }
 
   function showMap(stay) {
     mappedStay=stay;
     const panel=document.getElementById('collection-map-panel');
     if(!panel)return;
-    if(panel.querySelector('iframe')?.src!==Serenity.mapUrls(stay).embed)panel.innerHTML=view.mapPanel(stay);
-    panel.querySelector('iframe').title=view.t('mapTitleLabel',{name:view.local(stay.name)});
+    const title=view.t('mapTitleLabel',{name:view.local(stay.name)});
+    panel.querySelector('.map-panel').dataset.mapStay=stay.id;
+    panel.querySelector('.map-label strong').textContent=view.local(stay.map.label);
+    panel.querySelector('.naver-map').setAttribute('aria-label',title);
+    panel.querySelector('[data-map-naver]').href=Serenity.naverMapUrl(stay);
     document.getElementById('map-stay').value=stay.id;
     document.getElementById('map-home-name').textContent=view.local(stay.name);
+    syncNaverMap();
+  }
+
+  // One browser SDK and one map per page. No Secret or server API is used.
+  let naverReady, naverMap, naverHost;
+  let naverFailed=false;
+  function cleanupMap() {
+    naverMap?.destroy();
+    if(naverHost){
+      naverHost.hidden=true;
+      naverHost.closest('.map-panel').querySelector('.map-placeholder').hidden=false;
+    }
+    naverMap=naverHost=undefined;
+  }
+  function loadNaverMaps() {
+    const clientId=typeof SERENITY_MAP_CONFIG==='undefined'?'':SERENITY_MAP_CONFIG.clientId.trim();
+    if(!clientId || naverFailed)return Promise.resolve(null);
+    if(!naverReady)naverReady=new Promise(resolve=>{
+      window.serenityMapsReady=()=>resolve(window.naver?.maps || null);
+      window.navermap_authFailure=()=>{naverFailed=true;cleanupMap();resolve(null);};
+      const script=document.createElement('script');
+      script.src='https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId='+encodeURIComponent(clientId)+'&language=en&callback=serenityMapsReady';
+      script.async=true;
+      script.onerror=window.navermap_authFailure;
+      document.head.append(script);
+    });
+    return naverReady;
+  }
+  async function syncNaverMap() {
+    const host=document.querySelector('.naver-map');
+    if(!host)return;
+    const maps=await loadNaverMaps();
+    // Language changes can replace this DOM while the SDK is still loading.
+    if(!maps || naverFailed || host!==document.querySelector('.naver-map'))return;
+    const panel=host.closest('.map-panel');
+    const stay=openStays.find(item=>item.id===panel.dataset.mapStay);
+    const center=new maps.LatLng(stay.map.lat,stay.map.lng);
+    try {
+      if(naverHost!==host){
+        cleanupMap();naverHost=host;host.hidden=false;
+        naverMap=new maps.Map(host,{center,zoom:14,scrollWheel:false,zoomControl:true,tileTransition:false});
+      } else naverMap.setCenter(center);
+      panel.querySelector('.map-placeholder').hidden=true;
+    } catch {
+      naverFailed=true;cleanupMap();
+    }
   }
 
   async function stepShowcase(direction) {
@@ -324,6 +408,7 @@ else (() => {
     }
     featuredStay=stay;
     panel.innerHTML=view.showcase(stay);
+    refreshEntrances();
     document.getElementById('showcase-count').textContent=`${String(index+1).padStart(2,'0')} / ${String(openStays.length).padStart(2,'0')}`;
     document.getElementById('showcase-status').textContent=view.local(stay.name);
     showMap(stay);
@@ -342,10 +427,10 @@ else (() => {
     }
   }
 
-  function enhance() {animateSections();startSlideshow();setupScrollTracks();}
+  function enhance() {startSlideshow();setupScrollTracks();setupEntrances();syncNaverMap();}
   function applyLanguage(next) {
     if(!Serenity.languages.includes(next))return;
-    cleanupShowcase();cleanupMotion();cleanupSlideshow();cleanupTracks();
+    cleanupShowcase();cleanupSlideshow();cleanupTracks();cleanupEntrances();cleanupMap();
     language=next;view=createView(language,root);
     document.documentElement.lang=view.htmlLang;
     document.title=selectedStay ? `${view.local(selectedStay.name)} — Serenity Stay` : view.t('title');
@@ -374,7 +459,7 @@ else (() => {
     if(event.target.closest('.main-nav a'))closeMenu();
   });
   document.addEventListener('keydown',event=>{if(event.key==='Escape')closeMenu();});
-  reduceMotion.addEventListener('change',()=>{cleanupShowcase();cleanupMotion();cleanupSlideshow();cleanupTracks();enhance();});
+  reduceMotion.addEventListener('change',()=>{cleanupShowcase();cleanupSlideshow();cleanupTracks();enhance();});
   document.documentElement.classList.add('js');
   let saved;
   try{saved=localStorage.getItem('serenity-language');}catch{/* File/private browsing is supported. */}

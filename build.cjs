@@ -17,9 +17,10 @@ function documentFor(stay) {
   <meta name="theme-color" content="#302a25">
   <title>${escape(title)}</title>
   <link rel="icon" type="image/png" href="${root}assets/logo-wood.png">
-  <link rel="stylesheet" href="${root}styles.css?v=6">
-  <script src="${root}content.js?v=6" defer></script>
-  <script src="${root}app.js?v=6" defer></script>
+  <link rel="stylesheet" href="${root}styles.css?v=12">
+  <script src="${root}content.js?v=12" defer></script>
+  <script src="${root}map-config.js?v=12" defer></script>
+  <script src="${root}app.js?v=12" defer></script>
 </head>
 <body data-page="${stay ? stay.id : 'home'}" data-root="${root}">
   <a class="skip-link" href="#main">${view.t('skip')}</a>
