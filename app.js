@@ -49,7 +49,10 @@ const Serenity = (() => {
     const url = stay => `${root}stays/${stay.id}.html`;
     const booking = stay => `https://www.airbnb.co.kr/rooms/${stay.listingId}`;
     const external = `target="_blank" rel="noopener noreferrer"`;
-    const image = (src, alt, cls = '', eager = false) => `<img class="${cls}" src="${asset(src)}" alt="${escape(alt)}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
+    const image = (src, alt, cls = '', eager = false) => {
+      const size=data.imageSizes[src];
+      return `<img class="${cls}" src="${asset(src)}" alt="${escape(alt)}" ${size?`width="${size[0]}" height="${size[1]}"`:''} ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
+    };
     const bookLink = (stay, cls = 'button button-gold') => `<a class="${cls}" href="${booking(stay)}" ${external}>${tx('bookAirbnb')}${icon('diagonal')}<span class="sr-only">${tx('external')}</span></a>`;
 
     function header() {
@@ -67,8 +70,8 @@ const Serenity = (() => {
         <div class="hero-visual">${openStays.map((stay, i) => `<div class="hero-slide ${i === 0 ? 'is-active' : ''}" data-slide="${i}" ${i > 0 ? 'aria-hidden="true"' : ''}>${image(stay.cover, local(stay.alt), '', i === 0)}</div>`).join('')}</div>
         <div class="hero-shade"></div>
         <div class="hero-content">${header()}
-          <div class="hero-copy shell"><p class="eyebrow hero-intro">${tx('heroKicker')}</p><h1><span class="line-mask"><span>${tx('heroLine1')}</span></span><span class="line-mask"><em>${tx('heroLine2')}</em></span></h1><p class="hero-description">${tx('heroDescription')}</p><a class="button button-cream" href="#stays">${tx('heroExplore')}${icon('arrow')}</a></div>
-          <div class="hero-bottom shell"><a class="scroll-hint" href="#stays">${icon('down')}<span>${tx('scroll')}</span></a><div class="slide-info"><a id="hero-caption" href="${url(openStays[0])}">${escape(local(openStays[0].name))} · ${escape(city(openStays[0].city))}</a><div class="slide-controls"><span id="hero-count">01 / ${String(openStays.length).padStart(2,'0')}</span><button type="button" id="hero-prev" aria-label="${tx('previous')}">${icon('left')}</button><button type="button" id="hero-next" aria-label="${tx('next')}">${icon('right')}</button><button type="button" id="hero-pause" aria-label="${tx('pause')}">${icon('pause')}</button></div></div></div>
+          <div class="hero-copy shell"><p class="eyebrow hero-intro">${tx('heroKicker')}</p><h1><span class="line-mask"><span>${tx('heroLine1')}</span></span><span class="line-mask"><em>${tx('heroLine2')}</em></span></h1><div class="hero-summary"><p class="hero-description">${tx('heroDescription')}</p><a class="button button-cream" href="#stays">${tx('heroExplore')}${icon('arrow')}</a></div></div>
+          <div class="hero-bottom shell"><a class="scroll-hint" href="#stays">${icon('down')}<span>${tx('scroll')}</span></a><div class="slide-info"><span class="hero-progress" aria-hidden="true"><span></span></span><a id="hero-caption" href="${url(openStays[0])}">${escape(local(openStays[0].name))} · ${escape(city(openStays[0].city))}</a><div class="slide-controls"><span id="hero-count">01 / ${String(openStays.length).padStart(2,'0')}</span><button type="button" id="hero-prev" aria-label="${tx('previous')}">${icon('left')}</button><button type="button" id="hero-next" aria-label="${tx('next')}">${icon('right')}</button><button type="button" id="hero-pause" aria-label="${tx('pause')}">${icon('pause')}</button></div></div></div>
         </div>
       </section>`;
     }
@@ -79,14 +82,14 @@ const Serenity = (() => {
         <div class="card-body"><p class="card-area">${escape(city(stay.city))} · ${tx('comingSoon')}</p><h3>${tx('comingName')}</h3><p class="coming-note">${tx('comingNote')}</p></div></article>`;
       return `<article class="stay-card" id="${stay.id}"><a class="stay-card-link" href="${url(stay)}">
         <div class="card-photo">${image(stay.cover, local(stay.alt))}<span class="city-badge">${escape(city(stay.city))}</span><span class="photo-arrow">${icon('diagonal')}</span></div>
-        <div class="card-body"><p class="card-area">${escape(local(stay.area))}</p><div class="card-title"><h3>${escape(local(stay.name))}</h3>${icon('arrow')}</div><p class="card-tagline">${escape(local(stay.signature.title))}</p><span class="sr-only">${tx('fullTour')}</span></div>
+        <div class="card-body"><p class="card-area">${escape(local(stay.area))}</p><div class="card-title"><h3>${escape(local(stay.name))}</h3>${icon('arrow')}</div><p class="card-tagline">${escape(local(stay.signature.title))}</p></div>
         </a></article>`;
     }
 
     function showcase(stay) {
       return `<article class="home-showcase" aria-labelledby="showcase-name">
-        <div class="showcase-photos"><a class="showcase-cover" href="${url(stay)}">${image(stay.cover,local(stay.alt))}<span class="showcase-photo-label">SERENITY STAY / ${escape(stay.city.toUpperCase())}</span></a></div>
-        <div class="showcase-copy"><p class="eyebrow">${escape(city(stay.city))} · ${escape(local(stay.area))}</p><h3 id="showcase-name">${escape(local(stay.name))}</h3><p class="showcase-signature">${escape(local(stay.signature.title))}</p><p class="showcase-story">${escape(local(stay.signature.text))}</p><ul class="showcase-facts"><li>${icon('people')}${escape(t('guestCount',{n:stay.maxGuests}))}</li><li>${icon('bed')}${escape(t('bedroomCount',{n:stay.bedrooms}))}</li><li>${icon('bath')}${escape(t('bathroomCount',{n:stay.bathrooms}))}</li></ul><ul class="showcase-amenities">${stay.amenities.slice(0,3).map(key=>`<li>${tx(key)}</li>`).join('')}</ul><a class="button button-dark" href="${url(stay)}">${tx('viewTour')}${icon('arrow')}</a><a class="showcase-location" href="${url(stay)}#location">${icon('pin')}${tx('viewLocation')}</a></div>
+        <div class="showcase-photos reveal media-reveal"><a class="showcase-cover" href="${url(stay)}">${image(stay.cover,local(stay.alt))}<span class="showcase-photo-label"><span>SERENITY STAY / ${escape(stay.city.toUpperCase())}</span>${icon('diagonal')}</span></a></div>
+        <div class="showcase-copy reveal"><div class="showcase-chapter"><span aria-hidden="true">${String(openStays.findIndex(item=>item.id===stay.id)+1).padStart(2,'0')}</span><p class="eyebrow">${escape(city(stay.city))}<br>${escape(local(stay.area))}</p></div><h3 id="showcase-name">${escape(local(stay.name))}</h3><p class="showcase-signature">${escape(local(stay.signature.title))}</p><p class="showcase-story">${escape(local(stay.signature.text))}</p><ul class="showcase-facts"><li>${icon('people')}${escape(t('guestCount',{n:stay.maxGuests}))}</li><li>${icon('bed')}${escape(t('bedroomCount',{n:stay.bedrooms}))}</li><li>${icon('bath')}${escape(t('bathroomCount',{n:stay.bathrooms}))}</li></ul><ul class="showcase-amenities">${stay.amenities.slice(0,3).map(key=>`<li>${tx(key)}</li>`).join('')}</ul><a class="button button-dark" href="${url(stay)}">${tx('viewTour')}${icon('arrow')}</a><a class="showcase-location" href="${url(stay)}#location">${icon('pin')}${tx('viewLocation')}</a></div>
       </article>`;
     }
 
@@ -100,7 +103,8 @@ const Serenity = (() => {
     }
 
     function benefit(name, pictogram) {
-      return `<li class="benefit reveal">${icon(pictogram)}<h3>${tx(`value${name}`)}</h3><p>${tx(`value${name}Text`)}</p></li>`;
+      const number = ['Together','Home','Kitchen','Laundry','Arrival'].indexOf(name)+1;
+      return `<li class="benefit reveal"><div class="benefit-top"><span aria-hidden="true">0${number}</span>${icon(pictogram)}</div><h3>${tx(`value${name}`)}</h3><p>${tx(`value${name}Text`)}</p></li>`;
     }
 
     function destination(place) {
@@ -110,7 +114,7 @@ const Serenity = (() => {
 
     function home(featured = openStays[0]) {
       return `${homeHero()}
-        <section class="section collection shell" id="stays" aria-labelledby="collection-title"><div class="collection-intro reveal"><div><p class="eyebrow">${tx('collectionKicker')}</p><h2 id="collection-title">${tx('collectionTitle')}</h2></div><div class="host-introduction"><p>${tx('collectionDescription')}</p><p class="host-signature">${image('assets/logo-wood.png','','host-mark')}<span>${tx('hostSignature')}</span></p></div></div>
+        <section class="section collection shell" id="stays" aria-labelledby="collection-title"><div class="collection-intro"><div class="reveal"><p class="eyebrow">${tx('collectionKicker')}</p><h2 id="collection-title">${tx('collectionTitle')}</h2></div><div class="host-introduction reveal"><p>${tx('collectionDescription')}</p><p class="host-signature">${image('assets/logo-wood.png','','host-mark')}<span>${tx('hostSignature')}</span></p></div></div>
         <div class="showcase-toolbar"><p class="eyebrow">${tx('featuredKicker')}</p><div class="showcase-navigation js-control"><span id="showcase-count">${String(openStays.findIndex(item=>item.id===featured.id)+1).padStart(2,'0')} / ${String(openStays.length).padStart(2,'0')}</span><button class="round-button" data-showcase-step="-1" aria-controls="featured-home" aria-label="${tx('showcasePrev')}" type="button">${icon('left')}</button><button class="round-button" data-showcase-step="1" aria-controls="featured-home" aria-label="${tx('showcaseNext')}" type="button">${icon('right')}</button></div></div><div id="featured-home">${showcase(featured)}</div><p id="showcase-status" class="sr-only" role="status"></p>
         <div class="collection-meta"><div><h3>${tx('browseHomes')}</h3><span>${escape(t('collectionCount',{open:openStays.length,soon:data.stays.length-openStays.length}))}</span></div><div class="rail-controls js-control"><button class="round-button" data-scroll-for="home-rail" data-scroll-step="-1" aria-label="${tx('railPrev')}" type="button">${icon('left')}</button><button class="round-button" data-scroll-for="home-rail" data-scroll-step="1" aria-label="${tx('railNext')}" type="button">${icon('right')}</button></div></div><div class="home-rail" id="home-rail" data-scroll-track tabindex="0" aria-label="${tx('browseHomes')}">${data.stays.map(card).join('')}</div>${collectionMap(featured)}</section>
         <section class="why-section" id="why" aria-labelledby="why-title"><div class="shell"><div class="section-heading centered reveal"><p class="eyebrow">${tx('whyKicker')}</p><h2 id="why-title">${tx('whyTitle')}</h2><p>${tx('whyDescription')}</p></div><ul class="benefits">${benefit('Together','people')}${benefit('Home','home')}${benefit('Kitchen','kitchen')}${benefit('Laundry','laundry')}${benefit('Arrival','key')}</ul><div class="quiet-note reveal"><span></span><p>${tx('heroFootnote')}</p><span></span></div></div></section>
@@ -153,19 +157,36 @@ else (() => {
   let cleanupMotion = () => {};
   let cleanupSlideshow = () => {};
   let cleanupTracks = () => {};
+  let heroIndex = 0;
+  let heroPaused = false;
+  let showcaseRequest = 0;
+  let showcaseAnimations = [];
+
+  function cleanupShowcase() {
+    showcaseRequest++;
+    showcaseAnimations.forEach(animation=>animation.cancel());
+    showcaseAnimations=[];
+  }
 
   function animateSections() {
     if (!('IntersectionObserver' in window) || reduceMotion.matches) return;
-    const elements = [...document.querySelectorAll('.reveal')];
+    const elements = [...document.querySelectorAll('.reveal, .home-rail .stay-card, .collection-map-copy, .story-photo, .gallery-track figure')];
+    // Content is visible by default. Observation only starts a finite movement;
+    // clipping the observed element itself can make its intersection stay zero.
+    elements.forEach(element=>{
+      const siblings=[...element.parentElement.children].filter(child=>elements.includes(child));
+      element.style.setProperty('--order',Math.min(siblings.indexOf(element),4));
+      element.classList.toggle('media-reveal',element.matches('.showcase-photos, .story-photo, .gallery-track figure'));
+    });
     const observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (!entry.isIntersecting) return;
-        entry.target.classList.add('is-visible');
+        entry.target.classList.add('is-entering');
         observer.unobserve(entry.target);
       });
-    },{threshold:0.08});
-    elements.forEach(element=>{element.classList.add('will-reveal');observer.observe(element);});
-    cleanupMotion=()=>{observer.disconnect();elements.forEach(el=>el.classList.remove('will-reveal'));};
+    },{threshold:0.05});
+    elements.forEach(element=>observer.observe(element));
+    cleanupMotion=()=>{observer.disconnect();elements.forEach(el=>el.classList.remove('is-entering'));};
   }
 
   function startSlideshow() {
@@ -173,37 +194,77 @@ else (() => {
     if (!hero || openStays.length < 2) return;
     const slides = [...hero.querySelectorAll('.hero-slide')];
     const pause = document.getElementById('hero-pause');
-    let index = Math.max(0,slides.findIndex(slide=>slide.classList.contains('is-active')));
     let timer;
-    let userPaused = reduceMotion.matches;
     let inView = true;
-    function schedule() {
+    let request=0;
+    let requestedIndex=heroIndex;
+    let wipe;
+    let captionMotion;
+    const duration=7200;
+    const canAnimate=typeof hero.animate==='function' && !reduceMotion.matches;
+    // Every photo keeps its own transform while fading out; no active-class snap.
+    const photos=slides.map(slide=>canAnimate?slide.querySelector('img').animate([
+      {transform:'scale(1.13) translateX(-.5%)'},
+      {transform:'scale(1.025) translateX(.5%)'}
+    ],{duration:11000,easing:'linear',fill:'both'}):null);
+    photos.forEach(animation=>animation?.pause());
+    const progress=canAnimate?hero.querySelector('.hero-progress > span').animate([
+      {transform:'scaleX(0)'},{transform:'scaleX(1)'}
+    ],{duration,fill:'both'}):null;
+    progress?.pause();
+
+    function schedule(reset=false) {
       clearTimeout(timer);
-      const stopped = userPaused || reduceMotion.matches || document.hidden || !inView;
+      if(reset && progress)progress.currentTime=0;
+      const stopped = heroPaused || reduceMotion.matches || document.hidden || !inView;
       hero.classList.toggle('is-paused',stopped);
       pause.hidden=reduceMotion.matches;
-      pause.innerHTML=icon(userPaused ? 'play' : 'pause');
-      pause.setAttribute('aria-label',view.t(userPaused?'play':'pause'));
-      if (!stopped) timer=setTimeout(()=>show(index+1),7200);
+      pause.innerHTML=icon(heroPaused ? 'play' : 'pause');
+      pause.setAttribute('aria-label',view.t(heroPaused?'play':'pause'));
+      photos.forEach((animation,i)=>{if(animation){if(!stopped && i===heroIndex)animation.play();else animation.pause();}});
+      if(stopped)progress?.pause();
+      else {
+        progress?.play();
+        timer=setTimeout(()=>show(heroIndex+1),Math.max(0,duration-(Number(progress?.currentTime)||0)));
+      }
     }
-    function show(next) {
-      index=(next+slides.length)%slides.length;
-      slides.forEach((slide,i)=>{slide.classList.toggle('is-active',i===index);slide.setAttribute('aria-hidden',String(i!==index));});
+    function paint(index,animate) {
+      heroIndex=index;
+      slides.forEach((slide,i)=>{slide.classList.toggle('is-active',i===index);slide.setAttribute('aria-hidden',String(i!==index));slide.style.zIndex=i===index?'1':'0';});
       const stay=openStays[index];
       const caption=document.getElementById('hero-caption');
       caption.textContent=`${view.local(stay.name)} · ${view.city(stay.city)}`;
       caption.href=view.url(stay);
       document.getElementById('hero-count').textContent=`${String(index+1).padStart(2,'0')} / ${String(slides.length).padStart(2,'0')}`;
-      schedule();
+      if(animate && canAnimate) {
+        wipe?.cancel();captionMotion?.cancel();
+        wipe=slides[index].animate([{clipPath:'inset(0 0 0 100%)'},{clipPath:'inset(0 0 0 0)'}],{duration:1500,easing:'cubic-bezier(.22,1,.36,1)'});
+        captionMotion=caption.animate([{opacity:0,transform:'translateY(10px)'},{opacity:1,transform:'none'}],{duration:700,easing:'ease-out'});
+        photos[index].currentTime=0;
+      }
+      schedule(true);
     }
-    document.getElementById('hero-prev').onclick=()=>{userPaused=true;show(index-1);};
-    document.getElementById('hero-next').onclick=()=>{userPaused=true;show(index+1);};
-    pause.onclick=()=>{userPaused=!userPaused;schedule();};
-    document.addEventListener('visibilitychange',schedule);
+    async function show(next) {
+      requestedIndex=(next+slides.length)%slides.length;
+      const index=requestedIndex;
+      const token=++request;
+      clearTimeout(timer);progress?.pause();
+      const image=slides[index].querySelector('img');
+      image.loading='eager';
+      await image.decode().catch(()=>{});
+      if(token!==request)return;
+      if(!image.naturalWidth){heroPaused=true;schedule();return;}
+      paint(index,true);
+    }
+    document.getElementById('hero-prev').onclick=()=>{heroPaused=true;show(requestedIndex-1);};
+    document.getElementById('hero-next').onclick=()=>{heroPaused=true;show(requestedIndex+1);};
+    pause.onclick=()=>{heroPaused=!heroPaused;schedule();};
+    const onVisibility=()=>schedule();
+    document.addEventListener('visibilitychange',onVisibility);
     const observer='IntersectionObserver' in window ? new IntersectionObserver(entries=>{inView=entries[0].isIntersecting;schedule();}) : null;
     observer?.observe(hero);
-    schedule();
-    cleanupSlideshow=()=>{clearTimeout(timer);observer?.disconnect();document.removeEventListener('visibilitychange',schedule);};
+    paint(heroIndex,false);
+    cleanupSlideshow=()=>{request++;clearTimeout(timer);observer?.disconnect();document.removeEventListener('visibilitychange',onVisibility);photos.forEach(animation=>animation?.cancel());progress?.cancel();wipe?.cancel();captionMotion?.cancel();};
   }
 
   // Both photo tours and the home rail share one native scroll-snap controller.
@@ -238,26 +299,53 @@ else (() => {
     mappedStay=stay;
     const panel=document.getElementById('collection-map-panel');
     if(!panel)return;
-    panel.innerHTML=view.mapPanel(stay);
+    if(panel.querySelector('iframe')?.src!==Serenity.mapUrls(stay).embed)panel.innerHTML=view.mapPanel(stay);
+    panel.querySelector('iframe').title=view.t('mapTitleLabel',{name:view.local(stay.name)});
     document.getElementById('map-stay').value=stay.id;
     document.getElementById('map-home-name').textContent=view.local(stay.name);
   }
 
-  function stepShowcase(direction) {
+  async function stepShowcase(direction) {
+    cleanupShowcase();
+    const request=showcaseRequest;
     const index=(openStays.findIndex(stay=>stay.id===featuredStay.id)+direction+openStays.length)%openStays.length;
-    featuredStay=openStays[index];
+    const stay=openStays[index];
     const panel=document.getElementById('featured-home');
-    panel.innerHTML=view.showcase(featuredStay);
+    const photo=new Image();photo.src=root+stay.cover;
+    await photo.decode().catch(()=>{});
+    if(request!==showcaseRequest)return;
+    const canAnimate=!reduceMotion.matches && typeof panel.animate==='function';
+    if(canAnimate){
+      const copy=panel.querySelector('.showcase-copy');
+      const exit=copy.animate([{opacity:1,transform:'none'},{opacity:0,transform:'translateY(-12px)'}],{duration:170,fill:'forwards'});
+      showcaseAnimations.push(exit);
+      await exit.finished.catch(()=>{});
+      if(request!==showcaseRequest)return;
+    }
+    featuredStay=stay;
+    panel.innerHTML=view.showcase(stay);
     document.getElementById('showcase-count').textContent=`${String(index+1).padStart(2,'0')} / ${String(openStays.length).padStart(2,'0')}`;
-    document.getElementById('showcase-status').textContent=view.local(featuredStay.name);
-    showMap(featuredStay);
-    if(!reduceMotion.matches && panel.animate)panel.animate([{opacity:.25,transform:'translateY(14px)'},{opacity:1,transform:'translateY(0)'}],{duration:550,easing:'ease-out'});
+    document.getElementById('showcase-status').textContent=view.local(stay.name);
+    showMap(stay);
+    if(canAnimate){
+      const easing='cubic-bezier(.22,1,.36,1)';
+      showcaseAnimations.push(panel.querySelector('.showcase-photos').animate([
+        {clipPath:direction>0?'inset(0 0 0 100%)':'inset(0 100% 0 0)'},
+        {clipPath:'inset(0 0 0 0)'}
+      ],{duration:1050,easing}));
+      showcaseAnimations.push(panel.querySelector('.showcase-cover img').animate([
+        {transform:`scale(1.17) translateX(${direction*3}%)`},{transform:'scale(1.08) translateX(0)'}
+      ],{duration:1400,easing}));
+      [...panel.querySelector('.showcase-copy').children].forEach((element,i)=>{
+        showcaseAnimations.push(element.animate([{opacity:0,transform:'translateY(25px)'},{opacity:1,transform:'none'}],{duration:750,delay:100+i*65,fill:'backwards',easing}));
+      });
+    }
   }
 
   function enhance() {animateSections();startSlideshow();setupScrollTracks();}
   function applyLanguage(next) {
     if(!Serenity.languages.includes(next))return;
-    cleanupMotion();cleanupSlideshow();cleanupTracks();
+    cleanupShowcase();cleanupMotion();cleanupSlideshow();cleanupTracks();
     language=next;view=createView(language,root);
     document.documentElement.lang=view.htmlLang;
     document.title=selectedStay ? `${view.local(selectedStay.name)} — Serenity Stay` : view.t('title');
@@ -286,7 +374,7 @@ else (() => {
     if(event.target.closest('.main-nav a'))closeMenu();
   });
   document.addEventListener('keydown',event=>{if(event.key==='Escape')closeMenu();});
-  reduceMotion.addEventListener('change',()=>{cleanupMotion();cleanupSlideshow();cleanupTracks();enhance();});
+  reduceMotion.addEventListener('change',()=>{cleanupShowcase();cleanupMotion();cleanupSlideshow();cleanupTracks();enhance();});
   document.documentElement.classList.add('js');
   let saved;
   try{saved=localStorage.getItem('serenity-language');}catch{/* File/private browsing is supported. */}

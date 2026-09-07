@@ -14,12 +14,12 @@ function documentFor(stay) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="${escape(description)}">
-  <meta name="theme-color" content="#282e29">
+  <meta name="theme-color" content="#302a25">
   <title>${escape(title)}</title>
   <link rel="icon" type="image/png" href="${root}assets/logo-wood.png">
-  <link rel="stylesheet" href="${root}styles.css?v=4">
-  <script src="${root}content.js?v=4" defer></script>
-  <script src="${root}app.js?v=4" defer></script>
+  <link rel="stylesheet" href="${root}styles.css?v=6">
+  <script src="${root}content.js?v=6" defer></script>
+  <script src="${root}app.js?v=6" defer></script>
 </head>
 <body data-page="${stay ? stay.id : 'home'}" data-root="${root}">
   <a class="skip-link" href="#main">${view.t('skip')}</a>

@@ -173,4 +173,4 @@ console.log(`PASS — ${Object.keys(data.copy).length} complete EN/KO/ZH text en
 console.log('PASS — 4 real detail pages, exact Airbnb mapping, a non-bookable Coming Soon card, image assets and anchors.');
 console.log('PASS — owner introduction, 4 showcase states in 3 languages, three-across scroll rail, 9-card growth fixture.');
 console.log('PASS — 4 neighbourhood map configs, sample notices, no exact pins, hover/focus/touch source rules.');
-console.log('No browser, screenshot, mobile interaction, or visual QA was performed, as requested.');
+console.log('This check runs source/template validation only; it does not launch a browser.');

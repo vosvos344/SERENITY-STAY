@@ -2,6 +2,24 @@
    Add a stay to extend the portfolio and its independent HTML page.
    map.kind = area-sample: public neighbourhood demo only, never an exact home pin. */
 const SERENITY_CONTENT = {
+  "imageSizes": {
+    "assets/mia201-hero.jpg": [1920, 1281],
+    "assets/mia201-1.jpg": [1200, 805],
+    "assets/mia201-bedroom.jpg": [1200, 1800],
+    "assets/mia201-3.jpg": [720, 538],
+    "assets/mia202-1.jpg": [1200, 1196],
+    "assets/mia202-2.jpg": [720, 1080],
+    "assets/mia202-3.jpg": [720, 1080],
+    "assets/mia202-room.jpg": [1200, 1800],
+    "assets/yeonsin-1.jpg": [1200, 900],
+    "assets/yeonsin-2.jpg": [720, 480],
+    "assets/yeonsin-3.jpg": [720, 540],
+    "assets/songdo-1.jpg": [1200, 800],
+    "assets/songdo-2.jpg": [720, 480],
+    "assets/songdo-3.jpg": [720, 480],
+    "assets/seoul-gyeongbokgung.jpg": [1600, 1200],
+    "assets/busan-gwangan.jpg": [2816, 1584]
+  },
   "copy": {
     "title": [
       "Serenity Stay — Somewhere new. Something familiar.",
@@ -279,9 +297,9 @@ const SERENITY_CONTENT = {
       "SERENITY 的待客之道"
     ],
     "whyTitle": [
-      "Small touches. Better stays.",
-      "작은 배려가 만드는, 좋은 머무름.",
-      "细微的用心，舒适的旅程。"
+      "Small touches.\nBetter stays.",
+      "작은 배려가 만드는,\n좋은 머무름.",
+      "细微的用心，\n舒适的旅程。"
     ],
     "whyDescription": [
       "All the ease of home, with a whole new city outside.",
@@ -344,9 +362,9 @@ const SERENITY_CONTENT = {
       "推开门，遇见新的风景"
     ],
     "placesTitle": [
-      "Check in. Then head out.",
-      "짐을 풀었다면, 이제 떠나볼까요.",
-      "安顿好，再去看看世界。"
+      "Check in.\nThen head out.",
+      "짐을 풀었다면,\n이제 떠나볼까요.",
+      "安顿好，\n再去看看世界。"
     ],
     "placesDescription": [
       "Palace courtyards or a sea-breeze kind of afternoon.\nThere is more than one way to fall for Korea.",
