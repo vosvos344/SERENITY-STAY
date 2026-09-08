@@ -116,7 +116,15 @@ window.SERENITY = {
           "comfort201Copy"
         ]
       ],
-      "location": null
+      "location": {
+        "precision": "area",
+        "latitude": 37.6324,
+        "longitude": 127.0244,
+        "zoom": 15,
+        "area": "miaTemporaryArea",
+        "description": "miaTemporaryDescription",
+        "naverUrl": "https://map.naver.com/p/search/%EC%84%9C%EC%9A%B8%ED%8A%B9%EB%B3%84%EC%8B%9C%20%EA%B0%95%EB%B6%81%EA%B5%AC%20%EB%8D%95%EB%A6%89%EB%A1%9C28%EA%B8%B8"
+      }
     },
     {
       "id": "mia202",
@@ -202,7 +210,15 @@ window.SERENITY = {
           "comfort202Copy"
         ]
       ],
-      "location": null
+      "location": {
+        "precision": "area",
+        "latitude": 37.6324,
+        "longitude": 127.0244,
+        "zoom": 15,
+        "area": "miaTemporaryArea",
+        "description": "miaTemporaryDescription",
+        "naverUrl": "https://map.naver.com/p/search/%EC%84%9C%EC%9A%B8%ED%8A%B9%EB%B3%84%EC%8B%9C%20%EA%B0%95%EB%B6%81%EA%B5%AC%20%EB%8D%95%EB%A6%89%EB%A1%9C28%EA%B8%B8"
+      }
     },
     {
       "id": "busan",
@@ -393,11 +409,14 @@ window.SERENITY = {
       "locationPending": "Location details pending",
       "locationSoon": "Location to be announced",
       "mapPending": "Location information will be added here. In the meantime, explore this stay’s neighborhood on Airbnb.",
-      "mapSoon": "A new address, a new chapter. The location will be revealed with our opening details.",
+      "mapSoon": "Our Busan stay is getting ready. The location and opening details will be shared here when ready.",
       "mapExactNote": "This map shows the selected stay’s location. Check your Airbnb arrival instructions for entrance details.",
       "mapAreaNote": "This map shows the selected stay’s approximate area, not its exact address. Arrival details are shared through Airbnb after booking.",
       "mapPendingNote": "An exact location has not been published here for this stay. Your host will share arrival details through Airbnb.",
-      "mapAirbnb": "Location details on Airbnb"
+      "mapAirbnb": "Location details on Airbnb",
+      "miaTemporaryArea": "Mia-dong · Deongneung-ro 28-gil area",
+      "miaTemporaryDescription": "A temporary neighborhood guide around Deongneung-ro 28-gil in Mia-dong, Seoul. The map shows an approximate area; your exact arrival details will be shared through Airbnb.",
+      "mapSoonTitle": "Coming soon"
     },
     "zh": {
       "pageTitle": "Serenity Stay — 感受韩国的慢时光",
@@ -573,11 +592,14 @@ window.SERENITY = {
       "locationPending": "位置信息待更新",
       "locationSoon": "位置尚未公布",
       "mapPending": "位置信息将更新至此。您可以先在此房源的 Airbnb 页面了解周边区域。",
-      "mapSoon": "新的地址，新的故事。位置将随开业信息一同公布。",
+      "mapSoon": "我们的釜山住宿正在筹备中。具体位置与开业信息将于准备就绪后在此公布。",
       "mapExactNote": "地图显示所选房源的位置。入口等详细信息请查看 Airbnb 入住指引。",
       "mapAreaNote": "地图显示所选房源的大致区域，并非准确地址。预订后，房东会通过 Airbnb 提供抵达信息。",
       "mapPendingNote": "此房源尚未在这里公布准确位置。房东将通过 Airbnb 提供入住信息。",
-      "mapAirbnb": "在 Airbnb 查看位置"
+      "mapAirbnb": "在 Airbnb 查看位置",
+      "miaTemporaryArea": "弥阿洞 · Deongneung-ro 28-gil 周边",
+      "miaTemporaryDescription": "暂以首尔弥阿洞 Deongneung-ro 28-gil 周边作为区域参考。地图显示大致范围，准确入住地址将通过 Airbnb 提供。",
+      "mapSoonTitle": "即将启幕"
     },
     "ko": {
       "pageTitle": "Serenity Stay — 한국에서 만나는 느린 쉼",
@@ -753,11 +775,14 @@ window.SERENITY = {
       "locationPending": "위치 정보 준비 중",
       "locationSoon": "위치 공개 예정",
       "mapPending": "위치 정보를 준비하고 있습니다. 먼저 이 숙소의 에어비앤비에서 주변 지역을 확인해 주세요.",
-      "mapSoon": "새로운 주소에서 시작될 이야기. 오픈 소식과 함께 위치를 공개할 예정입니다.",
+      "mapSoon": "부산 숙소는 현재 오픈을 준비하고 있습니다. 준비가 완료되면 위치와 오픈 소식을 이곳에서 안내하겠습니다.",
       "mapExactNote": "선택한 숙소의 위치입니다. 출입구 등 자세한 도착 안내는 에어비앤비 메시지를 확인해 주세요.",
       "mapAreaNote": "선택한 숙소의 대략적인 주변 지역이며 정확한 주소는 아닙니다. 도착 안내는 예약 후 에어비앤비를 통해 전달됩니다.",
       "mapPendingNote": "이 숙소의 정확한 위치는 아직 이곳에 공개되지 않았습니다. 도착 안내는 호스트가 에어비앤비로 전달합니다.",
-      "mapAirbnb": "에어비앤비에서 위치 확인"
+      "mapAirbnb": "에어비앤비에서 위치 확인",
+      "miaTemporaryArea": "미아동 · 덕릉로28길 주변",
+      "miaTemporaryDescription": "서울 미아동 덕릉로28길 주변을 임시로 안내합니다. 지도는 대략적인 지역이며, 정확한 도착 정보는 에어비앤비를 통해 전달됩니다.",
+      "mapSoonTitle": "오픈 준비 중"
     }
   }
 };

@@ -84,7 +84,7 @@
     }
   });
   window.addEventListener('scroll', queueFrame, { passive: true });
-  window.addEventListener('resize', queueFrame, { passive: true });
+  window.addEventListener('resize', () => { resizeMap(); queueFrame(); }, { passive: true });
   document.fonts.ready.then(queueFrame);
   document.documentElement.classList.add('motion-ready');
 
@@ -153,7 +153,7 @@
     $('#gallery-thumbs').innerHTML = stay.photos.map(([src, caption], index) => `<button data-gallery-photo="${index}" aria-label="${escape(`${index + 1}. ${t(caption)}`)}" aria-pressed="${index === photoIndex}"><img src="${escape(src)}" alt="" loading="lazy" width="90" height="70"></button>`).join('');
     $('#dialog-book').href = stay.airbnb;
     $('#dialog-area-description').textContent = t(stay.location?.description || 'areaDescription');
-    $('#dialog-address').textContent = stay.location?.address || t(stay.city);
+    $('#dialog-address').textContent = stay.location?.address || (stay.location?.area ? t(stay.location.area) : t(stay.city));
     $('#dialog-location-note').textContent = mapNoteFor(stay);
     renderGallery();
   }
@@ -327,10 +327,19 @@
     $('#map-stay').value = selectedMapStayId;
     renderMap();
   }
+  function resizeMap() {
+    const frame = $('#naver-map');
+    if (!naverMap || frame.hidden || mapState !== 'ready') return;
+    // setSize writes pixel dimensions inline. Measure the CSS layout on every resize.
+    frame.style.removeProperty('width');
+    frame.style.removeProperty('height');
+    naverMap.setSize(new window.naver.maps.Size(frame.clientWidth, frame.clientHeight));
+  }
   function renderMap() {
     const stay = site.stays.find((item) => item.id === selectedMapStayId);
     if (!stay) return;
     const located = hasLocation(stay);
+    const comingSoon = stay.status === 'soon' && !located;
     const location = stay.location;
     const name = stay.city === 'busan' && stay.id === 'busan' ? t('busan') : stay.name;
     const precision = located ? (location.precision === 'area' ? 'locationArea' : 'locationExact') : (stay.status === 'soon' ? 'locationSoon' : 'locationPending');
@@ -341,7 +350,8 @@
     $('#map-address').textContent = location?.address || (location?.area ? t(location.area) : t(precision));
     $('#map-precision').textContent = `${stay.status === 'soon' ? `${t('comingSoon')} · ` : ''}${t(precision)}`;
     $('#map-fallback-label').textContent = t(precision);
-    $('#map-fallback-title').textContent = name;
+    $('#map-fallback-title').textContent = comingSoon ? t('mapSoonTitle') : name;
+    $('#map-fallback').classList.toggle('is-coming-soon', comingSoon);
     $('#map-note').textContent = mapNoteFor(stay);
     $('#naver-map').setAttribute('aria-label', `${name} · ${t('mapRegion')} · ${t(precision)}`);
     const url = location?.naverUrl || stay.airbnb;
@@ -368,9 +378,7 @@
         mapMarker = new n.Marker({ position: center });
         mapArea = new n.Circle({ center, radius: 650, strokeColor: '#737e60', strokeWeight: 1, strokeOpacity: .65, fillColor: '#9ba889', fillOpacity: .2 });
       } else {
-        // A hidden map may have been resized while a location was pending.
-        const frame = $('#naver-map');
-        naverMap.setSize(new n.Size(frame.clientWidth, frame.clientHeight));
+        resizeMap();
       }
       naverMap.updateBy(center, zoom);
       mapMarker.setOptions({ position: center, title: `${name} · ${t(precision)}`, icon: { content: `<div class="naver-area-label">${escape(name)}<small>${escape(t(precision))}</small></div>`, anchor: new n.Point(95, 46) } });

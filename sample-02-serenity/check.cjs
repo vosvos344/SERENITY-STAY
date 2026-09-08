@@ -235,6 +235,11 @@ async function checkMaps() {
       await page.locator('#map-stay').selectOption(stay.id);
       assert.equal(await page.locator('#map-stay-name').textContent(), stay.name);
       if (!stay.location) assert.equal(await page.locator('#naver-map').isVisible(), false);
+      else {
+        await page.waitForSelector('#naver-map .naver-area-label');
+        assert.equal(await page.locator('#map-address').textContent(), site.copy.en.miaTemporaryArea);
+        assert.equal(await page.locator('#map-note').textContent(), site.copy.en.mapAreaNote);
+      }
     }
     // Detail → location selects the correct stay and hands keyboard focus to the selector.
     await page.locator('[data-open-stay="mia202"]').first().click();
@@ -246,8 +251,17 @@ async function checkMaps() {
     for (const lang of ['en','zh','ko']) {
       await page.locator('#language').selectOption(lang);
       assert.equal(await page.locator('#map-stay').inputValue(), 'mia202');
+      await page.locator('#map-stay').selectOption('busan');
+      assert.equal(await page.locator('#map-fallback-title').textContent(), site.copy[lang].mapSoonTitle);
+      assert.equal(await page.locator('#map-status').textContent(), site.copy[lang].mapSoon);
+      assert.equal(await page.locator('#map-fallback-link').isVisible(), false);
+      assert.equal(await page.locator('#map-external-link').isVisible(), false);
+      await page.locator('#map-stay').selectOption('mia202');
+      assert.equal(await page.locator('#map-fallback').isVisible(), false);
       for (const width of [1440,768,390,320]) {
         await page.setViewportSize({width,height:900});
+        await page.waitForFunction(() => Math.abs(document.querySelector('#naver-map').clientWidth - document.querySelector('.map-card').clientWidth) <= 1);
+        assert.equal(await page.locator('#naver-map').evaluate(el => el.clientHeight), width <= 600 ? 350 : 470, 'Map height follows the responsive layout');
         assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), `${lang}: location UI overflow at ${width}px`);
       }
     }
@@ -255,19 +269,25 @@ async function checkMaps() {
     await page.locator('#language').selectOption('en');
     await page.locator('#neighborhood').scrollIntoViewIfNeeded();
     await page.screenshot({path:path.join(root,'screenshots','locations.png')});
+    await page.locator('#map-stay').selectOption('busan');
+    await page.screenshot({path:path.join(root,'screenshots','locations-busan.png')});
+    await page.locator('#map-stay').selectOption('mia202');
     await page.setViewportSize({width:390,height:844});
     await page.locator('#neighborhood').scrollIntoViewIfNeeded();
     await page.screenshot({path:path.join(root,'screenshots','locations-mobile.png')});
     await page.route('**/content.js*', route => route.fulfill({contentType:'application/javascript',body:fixture}));
     let sdkRequests = 0;
+    let releaseSdk;
+    const sdkReady = new Promise(resolve => { releaseSdk = resolve; });
     await page.route('**/openapi/v3/maps.js*', async route => {
       sdkRequests++;
-      await new Promise(resolve => setTimeout(resolve,350));
+      await sdkReady;
       await route.fulfill({contentType:'application/javascript',body:sdk});
     });
-    await page.goto(base + '/?lang=en', {waitUntil:'networkidle'});
+    await page.goto(base + '/?lang=en', {waitUntil:'domcontentloaded'});
     await page.locator('#map-stay').selectOption('mia202');
     await page.locator('#map-stay').selectOption('busan');
+    releaseSdk();
     await page.waitForFunction(() => window.__mapTest);
     assert.equal(await page.evaluate(() => __mapTest.maps.length), 0, 'A pending choice made during SDK loading must stay map-free');
     await page.locator('#map-stay').selectOption('mia202');
